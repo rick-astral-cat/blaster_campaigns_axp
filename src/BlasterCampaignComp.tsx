@@ -8,12 +8,16 @@ class BlasterCampaignComp extends HTMLElement {
 
 
     formatearFecha(fechaStr) {
-      const fecha = new Date(fechaStr);
-      return new Intl.DateTimeFormat('es-MX', {
+      const [year, month, day] = fechaStr.split("-").map(Number);
+      const fecha = new Date(year, month - 1, day);
+
+      let fechaT = new Intl.DateTimeFormat('es-MX', {
         day: 'numeric',
         month: 'long',
         year: 'numeric'
       }).format(fecha);
+      console.log("Esta es la fecha transformada: ", fechaT);
+      return fechaT;
     }
 
     showBlasterInformationOnApiCalled (){
@@ -41,11 +45,11 @@ class BlasterCampaignComp extends HTMLElement {
         //En caso de que la infromacion que es enviada de RT4 tenga errores de estructura o este faltante
         try{
           //Test variable, uncomment to do tests
-          let callerNameWithId = "3328341462019";
+          //let callerNameWithId = "3328341462019";
 
-          //Comment these two lines to tests
-          //let engagementParams = voiceInteraction[0].intrinsics.ENGAGEMENT_PARAMETERS;
-          //let callerNameWithId = JSON.parse(engagementParams).Numero;
+          //Comment these two lines to tests, uncomment for production
+          let engagementParams = voiceInteraction[0].intrinsics.ENGAGEMENT_PARAMETERS;
+          let callerNameWithId = JSON.parse(engagementParams).Numero;
 
           //let callerNameWithId = this.currentInteractions[0].intrinsics.CALLER_NAME;
           //callerNameWithId = callerNameWithId.replace(/\D/g, '').slice(-11);

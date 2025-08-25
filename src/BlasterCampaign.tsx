@@ -147,6 +147,7 @@ class BlasterCampaign extends React.Component {
                 {/* FECHA DE SERVICIO */}
                 <div 
                   class="int-cont-column"
+                  style={{ display: 'none' }}
                 >
                   <label >Fecha de servicio</label>
                   <span dir="ltr" id="blasterFechaServicio">Sin especificar</span>
