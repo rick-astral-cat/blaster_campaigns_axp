@@ -1,0 +1,169 @@
+#####################################################
+### CON PROMISE DE TIMEOUT ##########################
+#####################################################
+
+import {createElement} from 'react'
+import {render, unmountComponentAtNode} from 'react-dom'
+import Welcome from './Welcome';
+import { isEnumDeclaration } from 'typescript';
+
+class MyWebComp extends HTMLElement {
+
+    interactionData: any;
+    loaded = false
+
+    //function to set default data to show
+    setDefaultInteractionData(data: any): void {
+      console.log("Escribiendo informacion de contacto", data)
+      this.interactionData = [
+        {
+          "key": "Atributos",
+          "value": (data.attributes ?? []).length > 0 ? data.attributes : []
+        },
+        {
+          "key": "Engagement ID",
+          "value": data.workRequestId
+        }
+      ]
+    }
+
+    //function to set data on interaction data panel
+    setInformation(data) {
+      const dataRequestedDiv = document.getElementById('dataRequestedDiv');
+      if(dataRequestedDiv){
+        dataRequestedDiv.innerHTML = '';
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.fontSize = '11px';
+        table.style.marginTop = '5px';
+        // Iterar sobre los datos y agregar cada uno como un <li>
+        data.forEach(item => {
+          // Crear un nuevo elemento <li>
+          /*const li = document.createElement('li');
+          
+          // Llenar el <li> con la información de los datos
+          li.textContent = `${item.key}: ${item.value}`; // Cambia esto según la estructura de los datos JSON
+
+          // Agregar el <li> al div
+          dataRequestedDiv.appendChild(li); */
+          const row = document.createElement('tr');
+
+        // Crear la primera celda para la key
+        const cell1 = document.createElement('td');
+        cell1.textContent = item.key;
+
+        // Crear la segunda celda para el value
+        const cell2 = document.createElement('td');
+        cell2.textContent = item.value;
+
+        // Agregar las celdas a la fila
+        row.appendChild(cell1);
+        row.appendChild(cell2);
+
+        // Agregar la fila a la tabla
+        table.appendChild(row);
+        })
+
+        dataRequestedDiv.appendChild(table);
+        document.getElementById('loadingGif')?.remove()
+      }
+    }
+
+    connectedCallback () {
+      render(createElement(Welcome), this)
+
+      var api2 = (window as any).WS.widgetAPI();
+
+      api2.onDataEvent('onContextDataEvent', async (Data) => {
+
+        if (!this.loaded){
+          this.loaded = true;
+          var interactions = api2.getAllInteractions();
+          //print all interactions
+          //console.log(interactions[0])
+          this.setDefaultInteractionData(interactions[0])
+
+          //call proxy api
+
+          try {
+            //Promise for calling API backend
+            const fetchPromise = fetch("https://dalton.onekey.mx/proxy", {
+              method: "POST",
+              headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ engagementId: interactions[0].workRequestId })
+            });
+
+            //Promise for time out when calling API backend
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(
+                alert("Mueranse")
+              ), 500)
+            );
+
+            const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+            // Realizar la petición POST
+            /*
+            const response = await fetch(
+              "https://dalton.onekey.mx/proxy",
+              {
+                method: "POST",
+                headers: {
+                  "Accept": "application/json",
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({engagementId: interactions[0].workRequestId})
+              }
+            ); */
+            if (response instanceof Response){
+              console.log("ESTATUS: ", response.status);
+              // Verificar respuesta
+              if (response.status === 404) {
+                this.setInformation(this.interactionData);
+
+                const icon = document.getElementById("iconWithoutBot");
+                if (icon) {
+                  icon.style.display = "block";
+                  document.getElementById('iconSearching')?.remove()
+                }
+        
+
+                console.log("Informacion seteada en panel con informacion deafult de la intreaccion");
+                return;
+              }
+
+              if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+              // Convertir respuesta a JSON
+              var data = await response.json();
+              //join default data and API interaction data
+              data = this.interactionData.concat(data)
+              console.log("Informacion concatenada: ", data)
+
+              this.setInformation(data);
+              const icon2 = document.getElementById("iconWithBot");
+                if (icon2) {
+                  icon2.style.display = "block";
+                }
+              document.getElementById('iconSearching')?.remove()
+              return;
+            }
+          } // end try
+          catch (error) {
+            console.error("Error al obtener los datos:", error);
+          }
+        }
+          
+      })
+    }
+
+    disconnectedCallback () {
+        unmountComponentAtNode(Welcome)
+    }
+  }
+
+  customElements.define('botdata-comp', MyWebComp);
+

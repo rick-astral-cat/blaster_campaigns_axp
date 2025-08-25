@@ -1,0 +1,10 @@
+{
+    "name": "OKS Blaster Campaigns widget",
+    "description": "This widget manage RT4 blaster campaings. Customer data is retrieved from OKS web services and shown to agents on Avaya Workspaces",
+    "tags": ["widget", "api", "OKS"],
+    "version": "1.0.0",
+    "element": "<blaster-campaign-comp></blaster-campaign-comp>",
+    "icon": "neo-icon-sort",
+    "files": ["/blaster-campaign-comp.js"],
+    "override_url": "https://4ab9-189-178-41-133.ngrok-free.app"
+  }

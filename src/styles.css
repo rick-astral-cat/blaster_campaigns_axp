@@ -1,0 +1,41 @@
+.interactions-container {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: repeat(8, 1fr);
+    min-width: 800px;
+    padding: 15px;
+    color: #000;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.interactions-container .int-cont-column {
+    grid-column: span 4;
+    display: grid;
+    row-gap: 10px;
+}
+
+.interactions-container .int-cont-column label {
+    min-width: 400px;
+    font-size: 12px;
+}
+
+#blasterCustomerInfo, #blasterExceptApiAnswer, #blasterVoidApiAnswer {
+    display: none;
+}
+
+
+#blasterVoidApiAnswer .neo-widget__header, #blasterExceptApiAnswer .neo-widget__header{
+    justify-content: center !important;
+}
+
+#blasterVoidApiAnswer h4, #blasterExceptApiAnswer h4{
+    padding: 5px;
+    background-color: #ff000057;
+    margin-bottom: 5px;
+}
+
+#blasterExceptMessage {
+    display: block;
+    text-align: center;
+    margin: 10px 0px 10px 0px;
+}
