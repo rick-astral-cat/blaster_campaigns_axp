@@ -24,3 +24,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+#Ignore dist folder, this is de component builded
+/dist
